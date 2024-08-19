@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CustMaster {
+  Id       String    @id @default(uuid())
+  Name     String
+  Address  String
+  PAN      String    @unique
+  GST      String?   @unique
+  Invoice  Invoice[]
+  isActive Boolean
+}
+
+model ItemMaster {
+  ItemID   String  @id @default(uuid())
+  ItemName String
+  Cost     Int
+  isActive Boolean
+}
+
+model Invoice {
+  InvoiceID    String         @id @default(uuid())
+  CustMaster   CustMaster     @relation(fields: [CustomerID], references: [Id])
+  Cost         Int
+  InvoiceItems InvoiceItems[]
+  CustomerID   String
+  createdAt    DateTime       @default(now())
+}
+
+model InvoiceItems {
+  InvoiceItemID String  @id @default(uuid())
+  Invoice       Invoice @relation(fields: [InvoiceID], references: [InvoiceID])
+  Quantity      Int
+  GSTApplied    Boolean
+  ItemCost      Int
+  ItemName      String
+  InvoiceID     String
+}
